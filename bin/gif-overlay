@@ -1,0 +1,81 @@
+#!/usr/bin/env ruby
+require 'ostruct'
+require 'optparse'
+
+config = OpenStruct.new(
+  print_only: false,
+  gravity: 'south',
+  text: nil,
+  pointsize: '20',
+  offset: '+0+10',
+  outline: false,
+  in_path: nil,
+  out_path: nil,
+)
+
+opt_parser = OptionParser.new do |opts|
+  opts.banner = "Usage: #{$0} [options] in_image out_image"
+
+  opts.on('--text text', "text to overlay (required)") do |text|
+    config.text = text
+  end
+
+  opts.on('--offset offset', "text offset, defaults to #{config.offset}") do |offset|
+    config.offset = offset
+  end
+
+  opts.on('--print-only', "Just print the imagemagic command, don't run it") do
+    config.print_only = true
+  end
+
+  opts.on('--gravity gravity', 'Set the gravity (direction). Default: south') do |gravity|
+    config.gravity = gravity
+  end
+
+  opts.on('--outline', 'Outine the text') do
+    config.outline = true
+  end
+
+  opts.on("--pointsize pointsize', 'Set the pointsize (defaults to #{config.pointsize})") do |pointsize|
+    config.pointsize = pointsize
+  end
+
+  opts.on_tail("--help", "Show this message") do
+    puts opts
+    exit
+  end
+end
+
+opt_parser.order!(ARGV)
+
+config.in_path, config.out_path = ARGV.last(2)
+if !config.in_path || !config.out_path
+  puts opt_parser.help
+  exit 1
+end
+
+if !config.text
+  puts "please supply text with --text"
+  exit 1
+end
+
+command = ["convert"]
+
+command += ["-gravity", config.gravity]
+
+command += ["-pointsize", config.pointsize]
+
+command += ['-stroke', 'black', '-strokewidth', '4', '-weight', 'bold', '-annotate', config.offset, config.text] if config.outline
+command += ['-stroke', 'none',  '-fill', 'white',    '-weight', 'bold', '-annotate', config.offset, config.text]
+
+command += [config.in_path, config.out_path]
+
+puts command.join(' ')
+exit 0 if config.print_only
+
+if system('which', 'convert')
+  exec(*command)
+else
+  puts "ERROR: ImageMagick's convert does not appear to be installed"
+  exit 1
+end

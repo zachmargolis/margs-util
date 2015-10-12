@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+require 'rack/utils'
+require 'uri'
+require 'pp'
+require 'base64'
+
+decode_base64 = (ARGV.first == '--base64') ? ARGV.shift : nil
+
+uri = URI.parse(ARGV.first || STDIN.read)
+query = Rack::Utils.parse_nested_query(uri.query)
+
+if decode_base64
+  query = query.map do |key, value|
+    [ key, Base64.urlsafe_decode64(value) ]
+  end.to_h
+end
+
+puts uri.dup.tap { |u| u.query = nil; u.fragment = nil }.to_s
+pp query

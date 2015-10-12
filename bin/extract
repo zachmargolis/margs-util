@@ -1,0 +1,135 @@
+#!/usr/bin/env ruby
+require 'csv'
+
+module Extract
+  module_function
+
+  Config = Struct.new(:extractors, :separator, :output, :show_header, :show_help) do
+    alias_method :show_header?, :show_header
+
+    def show_help?
+      extractors.empty? || show_help
+    end
+  end
+
+  def extract(io, config, out=STDOUT)
+    CSV.instance(out, col_sep: config.output) do |csv|
+      # show_header row
+      csv << config.extractors.map(&:name) if config.show_header?
+
+      # each line
+      io.each do |line|
+        extracts = config.extractors.map { |e| e.extract(line) }
+        csv << extracts if !extracts.all?(&:nil?)
+      end
+    end
+  end
+
+  class IndexExtractor
+    attr_reader :index, :config
+
+    def initialize(index, config)
+      @index = index
+      @config = config
+    end
+
+    def name
+      "index_#{index}"
+    end
+
+    def separator
+      config.separator
+    end
+
+    def extract(line)
+      line.split(separator)[index]
+    end
+  end
+
+  class KeyExtractor
+    attr_reader :key, :regex
+
+    def initialize(key)
+      @key = key
+      @regex = /#{key}=(\S+)/i
+    end
+
+    alias_method :name, :key
+
+    def extract(line)
+      if (match = line.match(regex))
+        match[1]
+      end
+    end
+  end
+
+  class AfterExtractor
+    attr_reader :name
+
+    def initialize(name)
+      @name = name
+    end
+
+    def extract(line)
+      parts = line.split(' ')
+      if (index = parts.index(name))
+        parts[index + 1]
+      end
+    end
+  end
+end
+
+if __FILE__ == $PROGRAM_NAME
+  require 'optparse'
+
+  config = Extract::Config.new
+  config.extractors  = []
+  config.separator   = ' '
+  config.output      = ','
+  config.show_header = true
+
+  opts = OptionParser.new do |opts|
+    opts.banner = <<EOS
+Usage: #{$0} [options]
+  Read STDIN line-by-line, extract specified fields, and output them as a CSV
+
+EOS
+
+    opts.on('--index INDEX', 'specify a field to extract by index') do |index|
+      config.extractors << Extract::IndexExtractor.new(index.to_i, config)
+    end
+
+    opts.on('--key KEY', 'specify a field to extract by name (key=VALUE)') do |key|
+      config.extractors << Extract::KeyExtractor.new(key)
+    end
+
+    opts.on('--after WORD', 'specify the field after this word') do |name|
+      config.extractors << Extract::AfterExtractor.new(name)
+    end
+
+    opts.on('--separator SEPARATOR', 'delimeter for splitting input lines (for use with --index). Default: " "') do |separator|
+      config.separator = separator
+    end
+
+    opts.on('--output OUTPUT', 'delimeter to separate fields for output. Default: " "') do |output|
+      config.output = output
+    end
+
+    opts.on('--no-header', 'do not print the show_header row. Default: print the header') do
+      config.show_header = false
+    end
+
+    opts.on('-h', '--help', 'prints this help message') do
+      config.show_help = true
+    end
+  end
+
+  opts.parse!(ARGV)
+
+  if config.show_help?
+    puts opts
+    exit
+  else
+    Extract.extract(STDIN, config)
+  end
+end
