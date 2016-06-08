@@ -6,7 +6,7 @@ require 'base64'
 
 decode_base64 = (ARGV.first == '--base64') ? ARGV.shift : nil
 
-uri = URI.parse(ARGV.first || STDIN.read)
+uri = URI.parse((STDIN.tty? || ARGV.first) ? ARGV.first : STDIN.read.chomp)
 query = Rack::Utils.parse_nested_query(uri.query)
 
 if decode_base64
