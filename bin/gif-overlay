@@ -32,7 +32,7 @@ opt_parser = OptionParser.new do |opts|
     config.gravity = gravity
   end
 
-  opts.on('--outline', 'Outine the text') do
+  opts.on('--outline', 'Outline the text') do
     config.outline = true
   end
 
