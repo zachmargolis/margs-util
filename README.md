@@ -29,7 +29,7 @@ woo1,woo
 
 ### `gif-overlay`
 
-Overlays text at the bottom of a GIF. `convert` is just too much to remember on its own.
+Overlays text at the bottom of a GIF. `convert` is just too much to remember on its own, so I wrote this to help myself out.
 
 ```bash
 gif-overlay --text "THIS IS AWESOME" input.gif output.gif

@@ -1,11 +1,13 @@
 #!/usr/bin/env ruby
 require 'ostruct'
 require 'optparse'
+require 'shellwords'
 
 config = OpenStruct.new(
   print_only: false,
   gravity: 'south',
   text: nil,
+  resize: nil,
   pointsize: '20',
   offset: '+0+10',
   outline: false,
@@ -24,7 +26,7 @@ opt_parser = OptionParser.new do |opts|
     config.offset = offset
   end
 
-  opts.on('--print-only', "Just print the imagemagic command, don't run it") do
+  opts.on('--print-only', "Just print the ImageMagick command, don't run it") do
     config.print_only = true
   end
 
@@ -36,8 +38,12 @@ opt_parser = OptionParser.new do |opts|
     config.outline = true
   end
 
-  opts.on("--pointsize pointsize', 'Set the pointsize (defaults to #{config.pointsize})") do |pointsize|
+  opts.on('--pointsize pointsize', "Set the pointsize (defaults to #{config.pointsize})") do |pointsize|
     config.pointsize = pointsize
+  end
+
+  opts.on('--resize size', 'Resize the resulting image (ex 75% or 10x10)') do |resize|
+    config.resize = resize
   end
 
   opts.on_tail("--help", "Show this message") do
@@ -61,8 +67,9 @@ end
 
 command = ["convert"]
 
-command += ["-gravity", config.gravity]
+command += ["-resize", config.resize] if config.resize
 
+command += ["-gravity", config.gravity]
 command += ["-pointsize", config.pointsize]
 
 command += ['-stroke', 'black', '-strokewidth', '4', '-weight', 'bold', '-annotate', config.offset, config.text] if config.outline
@@ -70,7 +77,7 @@ command += ['-stroke', 'none',  '-fill', 'white',    '-weight', 'bold', '-annota
 
 command += [config.in_path, config.out_path]
 
-puts command.join(' ')
+puts Shellwords.join(command)
 exit 0 if config.print_only
 
 if system('which', 'convert')
