@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+require 'active_support/inflector'
+
+case (value = ARGV.shift)
+when '--camelize'
+  inflection = :camelize
+when '--underscore'
+  inflection = :underscore
+when '--humanize'
+  inflection = :humanize
+when '--titleize'
+  inflection = :titleize
+when '--dasherize'
+  inflection = :dasherize
+else
+  abort <<-EOS
+Error: Unknown inflection "#{value}"
+Usage: #{$0} [INFLECTION] [STRING]
+       #{$0} --camelize woo_woo
+       echo wooWoo | #{$0} --underscore
+  EOS
+end
+
+str = ARGV.first || STDIN.read
+puts str.send(inflection)

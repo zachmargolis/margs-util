@@ -6,6 +6,19 @@ require 'base64'
 
 decode_base64 = (ARGV.first == '--base64') ? ARGV.shift : nil
 
+if STDIN.tty? && ARGV.empty?
+  abort <<-STR
+Pretty-prints rack-style query params
+Usage:
+  #{$0} URL [--base64]
+  echo URL | #{$0} [--base64]
+
+Options:
+  --base64 base64 decodes values inside URL params
+STR
+  exit 1
+end
+
 uri = URI.parse((STDIN.tty? || ARGV.first) ? ARGV.first : STDIN.read.chomp)
 query = Rack::Utils.parse_nested_query(uri.query)
 

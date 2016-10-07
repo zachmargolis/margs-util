@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'stringio'
 require 'pp'
 
 RSpec.describe 'rack-query' do
@@ -15,6 +14,14 @@ RSpec.describe 'rack-query' do
     }.pretty_inspect
 
     "https://example.com/foo/bar/baz\n#{pretty_params}"
+  end
+
+  context 'with no arguments and no STDIN' do
+    subject(:rack_query) { bin('rack-query') }
+
+    it 'prints the usage' do
+      expect(rack_query).to include('Usage')
+    end
   end
 
   context 'with a URL in STDIN' do

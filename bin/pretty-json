@@ -1,4 +1,9 @@
 #!/usr/bin/env ruby
 require 'json'
 
+if STDIN.tty?
+  puts "no STDIN detected"
+  exit 1
+end
+
 puts JSON.pretty_generate(JSON.parse(ARGF.read))

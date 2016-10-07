@@ -1,0 +1,38 @@
+#!/usr/bin/env ruby
+require 'pp'
+require 'uri'
+require 'rack'
+require 'base64'
+
+uri_str = ARGV.first ? ARGV.first : STDIN.read
+uri = URI.parse(uri)
+
+def decode_deeper(params)
+  result = {}
+
+  params.each do |key, value|
+    decoded = begin
+      Base64.decode64(value)
+    rescue => e
+      value
+    end
+
+    unpacked = if decoded.include?('=')
+      Rack::Utils.parse_nested_query(unpacked)
+    else
+      decoded
+    end
+
+    result[key] = unpacked
+  end
+
+  result
+end
+
+params = if uri.query
+  decode_deeper Rack::Utils.parse_nested_query(uri.query)
+else
+  {}
+end
+
+pp params
