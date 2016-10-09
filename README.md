@@ -4,7 +4,11 @@ Some scripts I use, most of them have `--help` if you run them for more options.
 
 ## Installation
 
-I symlink to these in my `~/bin/` directory. Maybe I'll package these as a gem? Not sure yet.
+For now, it's a gem, but unpublished. To build and install locally:
+
+1. Clone the repo
+2. `gem build margs-util.gemspec`
+3. `gem install margs-util-*.gem`
 
 ## Scripts
 
