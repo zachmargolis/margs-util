@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Zach Margolis"]
   spec.email         = ["zbmargolis@gmail.com"]
 
-  spec.summary       = %q{Marg's simple utility scripts}
+  spec.summary       = %q{Margs's simple utility scripts}
   spec.description   = %q{Simple scripts for ImageMagick, URLs, JSON}
   spec.homepage      = "https://github.com/zachmargolis/margs-util"
   spec.license       = "MIT"
@@ -31,4 +31,5 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'rack'
+  spec.add_dependency 'nokogiri'
 end
