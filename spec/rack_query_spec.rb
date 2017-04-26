@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'stringio'
 require 'pp'
 
 RSpec.describe 'rack-query' do
