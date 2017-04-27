@@ -12,7 +12,7 @@ RSpec.describe 'extract' do
 
   subject(:extract) { bin('extract', *argv, stdin: stdin) }
 
-  context 'with a key' do
+  context 'with a --key' do
     let(:argv) { %w(--key k1) }
 
     it 'generates a CSV with the specified key' do
@@ -81,6 +81,25 @@ RSpec.describe 'extract' do
         key1
         some_useful_val
         some_other_useful_val
+      EOS
+    end
+  end
+
+  context 'with an --output' do
+    let(:stdin) do
+      <<-EOS.gsub(/^\s+/, '')
+        a b c d e
+        f g h i j
+      EOS
+    end
+
+    let(:argv) { ['--index', '0', '--index', '1', '--output= '] }
+
+    it 'grabs the space-separted word after' do
+      expect(extract).to eq <<-EOS.gsub(/^\s+/, '')
+        index_0 index_1
+        a b
+        f g
       EOS
     end
   end
