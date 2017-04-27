@@ -111,7 +111,7 @@ EOS
       config.separator = separator
     end
 
-    opts.on('--output OUTPUT', 'delimeter to separate fields for output. Default: " "') do |output|
+    opts.on('--output OUTPUT', 'delimeter to separate fields for output. Default: ","') do |output|
       config.output = output
     end
 
