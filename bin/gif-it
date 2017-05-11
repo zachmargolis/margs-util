@@ -1,0 +1,49 @@
+#!/bin/bash
+# Turn a movie into a GIF, with some nice defaults for framerate.
+# FFmpeg does poorly compressing colors on its own, so we use ImageMagick to
+# help out.
+
+function check_requirements() {
+  HAS_REQUIREMENTS=true
+
+  if [[ -z $(which ffmpeg) ]]; then
+    echo "Error: cannot find FFmpeg (ffmeg)"
+    HAS_REQUIREMENTS=false
+  fi
+
+  if [[ -z $(which convert) ]]; then
+    echo "Error: cannot find ImageMagick (convert)"
+    HAS_REQUIREMENTS=false
+  fi
+
+  if [[ -z HAS_REQUIREMENTS ]]; then
+    exit 10
+  fi
+}
+
+function usage() {
+  echo "Usage: $0 movie_file (framerate)"
+  exit 10
+}
+
+check_requirements
+
+MOVIE=$1
+FRAMERATE=$2
+
+if [ -z $FRAMERATE ]; then
+  FRAMERATE=10
+fi
+
+[[ $MOVIE ]] || usage
+
+SCRATCHDIR=$(mktemp -d gif-it-scratch-XXX)
+BASE=$(basename $MOVIE)
+GIF="$BASE.gif"
+TICKS=$(dc -e "100 $FRAMERATE / p")
+
+ffmpeg -i $MOVIE -r $FRAMERATE "$SCRATCHDIR/$BASE-%5d.png"
+convert -delay $TICKS "$SCRATCHDIR/*.png" $GIF
+
+rm -r $SCRATCHDIR
+echo $GIF
