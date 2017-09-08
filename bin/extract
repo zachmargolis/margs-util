@@ -13,6 +13,8 @@ module Extract
   end
 
   def extract(io, config, out=STDOUT)
+    out.sync = true
+
     CSV.instance(out, col_sep: config.output) do |csv|
       # show_header row
       csv << config.extractors.map(&:name) if config.show_header?
@@ -23,6 +25,7 @@ module Extract
         csv << extracts if !extracts.all?(&:nil?)
       end
     end
+  rescue Interrupt, Errno::EPIPE
   end
 
   class IndexExtractor
