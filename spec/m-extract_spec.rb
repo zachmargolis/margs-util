@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'pp'
 
-RSpec.describe 'extract' do
+RSpec.describe 'm-extract' do
   let(:argv) { [] }
   let(:stdin) do
     <<-EOS.gsub(/^\s+/, '')
@@ -10,7 +10,7 @@ RSpec.describe 'extract' do
     EOS
   end
 
-  subject(:extract) { bin('extract', *argv, stdin: stdin) }
+  subject(:extract) { bin('m-extract', *argv, stdin: stdin) }
 
   context 'with a --key' do
     let(:argv) { %w(--key k1) }

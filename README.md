@@ -12,17 +12,17 @@ For now, it's a gem, but unpublished. To build and install locally:
 
 ## Scripts
 
-- [`extract`](#extract)
+- [`m-extract`](#m-extract)
 - [`gif-overlay`](#gif-overlay)
 - [`pretty-json`](#pretty-json)
 - [`rack-query`](#rack-query)
 
-### `extract`
+### `m-extract`
 
 Extract input (usually from a log file) into a CSV-like output. Supports grabbing fields by index, or by key in the form `key=value`. Great for parsing logs!
 
 ```bash
-$ extract --index 1 --key key <<EOS
+$ m-extract --index 1 --key key <<EOS
 col0 col1 key=yay bar=nope
 woo0 woo1 key=woo
 EOS
