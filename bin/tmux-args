@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+
+if !system('which', 'tmux', out: '/dev/null')
+  abort "#{$PROGRAM_NAME}: tmux is not installed"
+end
+
+if !ENV['TMUX']
+  abort "#{$PROGRAM_NAME}: not in a tmux session"
+end
+
+if ARGV.empty?
+  abort "Usage: #{$PROGRAM_NAME} arg1 [arg2...]"
+end
+
+def tmux(*args)
+  system('tmux', *args)
+end
+
+if !tmux 'list-sessions', out: '/dev/null'
+  tmux 'new-session'
+end
+
+tmux 'new-window'
+
+ARGV.each_with_index do |arg, idx|
+  tmux 'send-keys', arg
+
+  if idx < (ARGV.size - 1)
+    tmux 'split-pane'
+  end
+
+  tmux 'select-layout', 'tiled'
+end
+
+tmux 'select-pane', '-t', '0'
+tmux 'set-window-option', 'synchronize-panes', 'on'

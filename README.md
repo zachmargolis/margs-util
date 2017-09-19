@@ -63,3 +63,12 @@ $ rack-query 'https://example.com/foo/bar/baz?x=y&z[]=1&z[]=2#wooo'
 https://example.com/foo/bar/baz
 {"x"=>"y", "z"=>["1", "2"]}
 ```
+
+### `tmux-args`
+
+Opens a pane in tmux with the given argument entered, also sets synchronize-panes
+
+
+```bash
+$ tmux-args a b c d
+```
